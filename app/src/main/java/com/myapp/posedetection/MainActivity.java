@@ -302,14 +302,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("PROCESS POSE", "PROCESS POSE FUNCTION IS RUNNING");
             Log.d("right ankle:","right ankle: "+ rightAnkle);
 
-            //Measurements
+            //Calculate the distance between the user's Ankles in pixels
             assert rightAnkle != null;
-            double rAnklex = rightAnkle.getPosition().x;
             assert leftAnkle != null;
-            double lAnklex = leftAnkle.getPosition().x;
-            double rAnkley = rightAnkle.getPosition().y;
-            double lAnkley = leftAnkle.getPosition().y;
-            double distance_pixels = sqrt(Math.pow((rAnklex - lAnklex),2) + Math.pow((rAnkley - lAnkley),2));
+            double distance_pixels = sqrt(Math.pow((rightAnkle.getPosition().x - leftAnkle.getPosition().x),2) + Math.pow((rightAnkle.getPosition().y - leftAnkle.getPosition().y),2));
             Log.d("distP","distance_pixels: "+distance_pixels);
             double distance_from_camera = 2.0;
 
@@ -319,19 +315,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // Calculate the user's height
             assert leftShoulder != null;
-            double heightInPixels = leftAnkle.getPosition().y - leftShoulder.getPosition().y;
+            double heightInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftShoulder.getPosition().y),2));
             double heightInMeters = heightInPixels * pixel_to_meter_ratio;
 
             // Calculate the user's thigh length
             assert leftHip != null;
             assert leftKnee != null;
-            double thighLengthInPixels = leftKnee.getPosition().y - leftHip.getPosition().y;
+            double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
             double thighLengthInMeters = thighLengthInPixels * pixel_to_meter_ratio;
 
             // Calculate the user's calf length
-            double calfLengthInPixels = leftAnkle.getPosition().y - leftKnee.getPosition().y;
+            double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
             double calfLengthInMeters = calfLengthInPixels * pixel_to_meter_ratio;
-
 
             String heightP_str = String.format("%.2f",heightInPixels);
             String calfP_str = String.format("%.2f",calfLengthInPixels);
