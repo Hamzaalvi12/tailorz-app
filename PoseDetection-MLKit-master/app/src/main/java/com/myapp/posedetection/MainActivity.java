@@ -14,17 +14,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Size;
-import android.util.SizeF;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -59,22 +55,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout cameraButton, galleryButton;
     CameraView cameraViewPose;
     ProgressBar progressBar;
-
+    // get the sensor size and focal length
     CameraManager manager;
     String cameraId;
 
-    SizeF sensor_size;
+    private double sensor_size;
     private double focal_length;
-    Size previewSize;
-
-    // calculate Field of vision
-
-    private double sensorSizeMM;
-    private double sensorDiagonalPixels;
-    private double focalLengthPixels;
-    private double field_of_vision;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,35 +100,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         assert characteristics != null;
-
-        // get the sensor size and focal length
-        sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);;
+        sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE).getWidth();;
         focal_length = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)[0];;
 
-        StreamConfigurationMap streamMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        Size[] previewSizes = streamMap.getOutputSizes(SurfaceTexture.class);
-        previewSize = previewSizes[0];
-
-        Log.d("sensor_size", "Sensor Size Height: " + String.format("%.2f",sensor_size.getHeight()) + " mm");
-        Log.d("sensor_size", "Sensor Size Width: " + String.format("%.2f",sensor_size.getWidth()) + " mm");
-        Log.d("focal_length", "Focal Length: "+ String.format("%.2f",focal_length) + " mm");
-
-        // calculate Field of vision
-
-        sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
-        Log.d("sensor_size", "Sensor Size in MM: "+ String.format("%.2f",sensorSizeMM) + " mm");
-
-        sensorDiagonalPixels = Math.sqrt(Math.pow(previewSize.getWidth(), 2) + Math.pow(previewSize.getHeight(), 2));
-        Log.d("sensor_size", "Sensor Diagonal Pixels: " + String.format("%.2f",sensorDiagonalPixels) + " pixels");
-
-        focalLengthPixels = focal_length * sensorDiagonalPixels / sensorSizeMM;
-        Log.d("focal_length", "Focal Length in Pixels: "+ String.format("%.2f",focalLengthPixels) + " pixels");
-
-        //field_of_vision = (360 * Math.atan2(sensorSizeMM / 2, focalLengthPixels))/Math.PI;
-        //Calculate the Field of Vision in Radians (not degrees)
-        field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);
-        Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
-
+        Log.d("sensor_size: ", String.valueOf(sensor_size));
+        Log.d("focal_length: ", String.valueOf(focal_length));
 
         cameraButton = findViewById(R.id.cameraBtn);
         galleryButton = findViewById(R.id.galleryBtn);
@@ -279,10 +241,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(MainActivity.this, "\n" + "Pose Not Detected",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Pose Tespit Edilemedi",Toast.LENGTH_SHORT).show();
                             }
                         });
     }
+
+    // Pose Detect
+    String angleText;
+    String measureText;
 
     private void processPose(Pose pose) {
         try {
@@ -300,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
             PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
             Log.d("PROCESS POSE", "PROCESS POSE FUNCTION IS RUNNING");
-            Log.d("right ankle:","right ankle: "+ rightAnkle);
+
 
             //Measurements
             assert rightAnkle != null;
@@ -310,52 +276,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double rAnkley = rightAnkle.getPosition().y;
             double lAnkley = leftAnkle.getPosition().y;
             double distance_pixels = sqrt(Math.pow((rAnklex - lAnklex),2) + Math.pow((rAnkley - lAnkley),2));
-            Log.d("distP","distance_pixels: "+distance_pixels);
             double distance_from_camera = 2.0;
 
-            //calculate the Pixel to Meter Ratio
+            // calculate Field of vision
+
+            double field_of_vision = 2 * atan(sensor_size / (2 * focal_length));
             double pixel_to_meter_ratio = distance_pixels / (2 * distance_from_camera * tan(field_of_vision / 2));
-            Log.d("ptm","pixel to meters: "+pixel_to_meter_ratio);
 
             // Calculate the user's height
             assert leftShoulder != null;
-            double heightInPixels = leftAnkle.getPosition().y - leftShoulder.getPosition().y;
+            double heightInPixels = leftShoulder.getPosition().y - leftAnkle.getPosition().y;
             double heightInMeters = heightInPixels * pixel_to_meter_ratio;
 
             // Calculate the user's thigh length
             assert leftHip != null;
             assert leftKnee != null;
-            double thighLengthInPixels = leftKnee.getPosition().y - leftHip.getPosition().y;
+            double thighLengthInPixels = leftHip.getPosition().y - leftKnee.getPosition().y;
             double thighLengthInMeters = thighLengthInPixels * pixel_to_meter_ratio;
 
             // Calculate the user's calf length
-            double calfLengthInPixels = leftAnkle.getPosition().y - leftKnee.getPosition().y;
+            double calfLengthInPixels = leftKnee.getPosition().y - leftAnkle.getPosition().y;
             double calfLengthInMeters = calfLengthInPixels * pixel_to_meter_ratio;
 
-
-            String heightP_str = String.format("%.2f",heightInPixels);
-            String calfP_str = String.format("%.2f",calfLengthInPixels);
-            String thighP_str = String.format("%.2f",thighLengthInPixels);
-            String height_str = String.format("%.2f",heightInMeters);
-            String calf_str = String.format("%.2f",calfLengthInMeters);
-            String thigh_str = String.format("%.2f",thighLengthInMeters);
-            String fov_str = String.format("%.2f",field_of_vision);
-            String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
-            String distP_str = String.format("%.2f",distance_pixels);
-            String ss_str = String.format("%.2f",sensorSizeMM);
-            String fc_str = String.format("%.2f",focal_length);
-
-            String measureText ="sensor size : "+ss_str+" mm\n" +
-                    "focal length : "+fc_str+" mm\n" +
-                    "field of vision : "+fov_str+" radians\n" +
-                    "pixel to meters ratio : "+ptm_str+"\n" +
-                    "feet distance : "+distP_str+" pixels\n" +
-                    "Height in pixels: "+heightP_str+" pixels\n" +
-                    "Calf Length in pixels: "+calfP_str+" pixels\n" +
-                    "Thigh Length in pixels: "+thighP_str+" pixels\n"+
-                    "Height: "+height_str+" meters\n" +
-                    "Calf Length: "+calf_str+" meters\n" +
-                    "Thigh Length: "+thigh_str+" meters\n";
+            measureText = "Height: "+heightInMeters+"\n" +
+                    "Calf Length: "+calfLengthInMeters+"\n" +
+                    "Thigh Length: "+thighLengthInMeters+"\n";
 
             Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             intent.putExtra("Text", measureText);
@@ -368,4 +313,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             progressBar.setVisibility(View.INVISIBLE);
         }
     }
+
+    // Pose Draw
+    private void DisplayAll(float lShoulderX, float lShoulderY, float rShoulderX, float rShoulderY,
+                            float lElbowX, float lElbowY, float rElbowX, float rElbowY,
+                            float lWristX, float lWristY, float rWristX, float rWristY,
+                            float lHipX, float lHipY, float rHipX, float rHipY,
+                            float lKneeX, float lKneeY, float rKneeX, float rKneeY,
+                            float lAnkleX, float lAnkleY, float rAnkleX, float rAnkleY) {
+
+        /*Paint paint = new Paint();
+        paint.setColor(Color.GREEN);
+        float strokeWidth = 4.0f;
+        paint.setStrokeWidth(strokeWidth);
+
+        Bitmap drawBitmap = Bitmap.createBitmap(resizedBitmap.getWidth(), resizedBitmap.getHeight(), resizedBitmap.getConfig());
+
+        Canvas canvas =new Canvas(drawBitmap);
+        canvas.drawBitmap(resizedBitmap, 0f, 0f, null);
+        canvas.drawLine(lShoulderX, lShoulderY, rShoulderX, rShoulderY, paint);
+        canvas.drawLine(rShoulderX, rShoulderY, rElbowX, rElbowY, paint);
+        canvas.drawLine(rElbowX, rElbowY, rWristX, rWristY, paint);
+        canvas.drawLine(lShoulderX, lShoulderY, lElbowX, lElbowY, paint);
+        canvas.drawLine(lElbowX, lElbowY, lWristX, lWristY, paint);
+        canvas.drawLine(rShoulderX, rShoulderY, rHipX, rHipY, paint);
+        canvas.drawLine(lShoulderX, lShoulderY, lHipX, lHipY, paint);
+        canvas.drawLine(lHipX, lHipY, rHipX, rHipY, paint);
+        canvas.drawLine(rHipX, rHipY, rKneeX, rKneeY, paint);
+        canvas.drawLine(lHipX, lHipY, lKneeX, lKneeY, paint);
+        canvas.drawLine(rKneeX, rKneeY, rAnkleX, rAnkleY, paint);
+        canvas.drawLine(lKneeX, lKneeY, lAnkleX, lAnkleY, paint);
+
+        Singleton singleton = Singleton.getInstance();
+        singleton.setMyImage(drawBitmap);
+        */
+        Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+        intent.putExtra("Text", measureText);
+
+        startActivity(intent);
+
+    }
+
 }
