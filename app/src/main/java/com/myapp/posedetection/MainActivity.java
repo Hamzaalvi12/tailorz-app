@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CameraView cameraViewPose;
     ProgressBar progressBar;
 
+
+    // Create an object 'manager' of Class CameraManager
     CameraManager manager;
     String cameraId;
 
@@ -316,17 +318,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Calculate the user's height
             assert leftShoulder != null;
             double heightInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftShoulder.getPosition().y),2));
-            double heightInMeters = heightInPixels * pixel_to_meter_ratio;
+            double heightInMeters = heightInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's thigh length
             assert leftHip != null;
             assert leftKnee != null;
             double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
-            double thighLengthInMeters = thighLengthInPixels * pixel_to_meter_ratio;
+            double thighLengthInMeters = thighLengthInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's calf length
             double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
-            double calfLengthInMeters = calfLengthInPixels * pixel_to_meter_ratio;
+            double calfLengthInMeters = calfLengthInPixels / pixel_to_meter_ratio;
 
             String heightP_str = String.format("%.2f",heightInPixels);
             String calfP_str = String.format("%.2f",calfLengthInPixels);
@@ -334,23 +336,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String height_str = String.format("%.2f",heightInMeters);
             String calf_str = String.format("%.2f",calfLengthInMeters);
             String thigh_str = String.format("%.2f",thighLengthInMeters);
-            String fov_str = String.format("%.2f",field_of_vision);
+            String fov_str = String.valueOf(field_of_vision);
             String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
             String distP_str = String.format("%.2f",distance_pixels);
             String ss_str = String.format("%.2f",sensorSizeMM);
             String fc_str = String.format("%.2f",focal_length);
+            String fc_str_p = String.format("%.2f", focalLengthPixels);
+            String pv_w = String.valueOf(previewSize.getWidth());
+            String pv_h = String.valueOf(previewSize.getHeight());
+            String ss_w = String.valueOf(sensor_size.getWidth());
+            String ss_h = String.valueOf(sensor_size.getHeight());
 
-            String measureText ="sensor size : "+ss_str+" mm\n" +
-                    "focal length : "+fc_str+" mm\n" +
-                    "field of vision : "+fov_str+" radians\n" +
-                    "pixel to meters ratio : "+ptm_str+"\n" +
-                    "feet distance : "+distP_str+" pixels\n" +
-                    "Height in pixels: "+heightP_str+" pixels\n" +
-                    "Calf Length in pixels: "+calfP_str+" pixels\n" +
-                    "Thigh Length in pixels: "+thighP_str+" pixels\n"+
-                    "Height: "+height_str+" meters\n" +
-                    "Calf Length: "+calf_str+" meters\n" +
-                    "Thigh Length: "+thigh_str+" meters\n";
+
+            String measureText ="sensor size : "+ ss_str +" mm\n" +
+                    "focal length : "+ fc_str +" mm\n" +
+                    "focal length (p): "+ fc_str_p +" pixels\n" +
+                    "field of vision : "+ fov_str +" radians\n" +
+                    "sensor size : "+ ss_w + "X " + ss_h + "\n"+
+                    "preview Size : "+ pv_w +" X " + pv_h + "\n" +
+                    "pixel to meters ratio : "+ ptm_str +"\n" +
+                    "feet distance : "+ distP_str +" pixels\n" +
+                    "Height in pixels: "+ heightP_str +" pixels\n" +
+                    "Calf Length in pixels: "+ calfP_str +" pixels\n" +
+                    "Thigh Length in pixels: "+ thighP_str +" pixels\n"+
+                    "Height: "+ height_str +" metres\n" +
+                    "Calf Length: "+ calf_str +" metres\n" +
+                    "Thigh Length: "+ thigh_str +" metres\n";
 
             Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             intent.putExtra("Text", measureText);
