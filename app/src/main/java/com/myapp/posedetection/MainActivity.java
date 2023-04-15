@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CameraView cameraViewPose;
     ProgressBar progressBar;
 
+
+    // Create an object 'manager' of Class CameraManager
     CameraManager manager;
     String cameraId;
 
@@ -342,18 +344,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String distP_str = String.format("%.2f",distance_pixels);
             String ss_str = String.format("%.2f",sensorSizeMM);
             String fc_str = String.format("%.2f",focal_length);
+            String fc_str_p = String.format("%.2f", focalLengthPixels);
+            String pv_w = String.valueOf(previewSize.getWidth());
+            String pv_h = String.valueOf(previewSize.getHeight());
+            String ss_w = String.valueOf(sensor_size.getWidth());
+            String ss_h = String.valueOf(sensor_size.getHeight());
 
-            String measureText ="sensor size : "+ss_str+" mm\n" +
-                    "focal length : "+fc_str+" mm\n" +
-                    "field of vision : "+fov_str+" radians\n" +
-                    "pixel to meters ratio : "+ptm_str+"\n" +
-                    "feet distance : "+distP_str+" pixels\n" +
-                    "Height in pixels: "+heightP_str+" pixels\n" +
-                    "Calf Length in pixels: "+calfP_str+" pixels\n" +
-                    "Thigh Length in pixels: "+thighP_str+" pixels\n"+
-                    "Height: "+height_str+" meters\n" +
-                    "Calf Length: "+calf_str+" meters\n" +
-                    "Thigh Length: "+thigh_str+" meters\n";
+
+            String measureText ="sensor size : "+ ss_str +" mm\n" +
+                    "focal length : "+ fc_str +" mm\n" +
+                    "focal length (p): "+ fc_str_p +" pixels\n" +
+                    "field of vision : "+ fov_str +" radians\n" +
+                    "sensor size : "+ ss_w + "X " + ss_h + "\n"+
+                    "preview Size : "+ pv_w +" X " + pv_h + "\n" +
+                    "pixel to meters ratio : "+ ptm_str +"\n" +
+                    "feet distance : "+ distP_str +" pixels\n" +
+                    "Height in pixels: "+ heightP_str +" pixels\n" +
+                    "Calf Length in pixels: "+ calfP_str +" pixels\n" +
+                    "Thigh Length in pixels: "+ thighP_str +" pixels\n"+
+                    "Height: "+ height_str +" metres\n" +
+                    "Calf Length: "+ calf_str +" metres\n" +
+                    "Thigh Length: "+ thigh_str +" metres\n";
 
             Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             intent.putExtra("Text", measureText);
