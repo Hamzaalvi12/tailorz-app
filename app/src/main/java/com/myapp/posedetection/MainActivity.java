@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 }
             }
+            //IDK
             if (defaultCameraId == null && cameraIds.length > 0) {
                 defaultCameraId = cameraIds[0];
             }
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         assert characteristics != null;
 
         // get the sensor size and focal length
+        //WHY FOCEL LENGATH 0
         sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);;
         focal_length = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)[0];;
 
@@ -131,10 +133,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         Log.d("sensor_size", "Sensor Size in MM: "+ String.format("%.2f",sensorSizeMM) + " mm");
-
+        //WHAT IS THIS
         sensorDiagonalPixels = Math.sqrt(Math.pow(previewSize.getWidth(), 2) + Math.pow(previewSize.getHeight(), 2));
         Log.d("sensor_size", "Sensor Diagonal Pixels: " + String.format("%.2f",sensorDiagonalPixels) + " pixels");
-
+        //IDK
         focalLengthPixels = focal_length * sensorDiagonalPixels / sensorSizeMM;
         Log.d("focal_length", "Focal Length in Pixels: "+ String.format("%.2f",focalLengthPixels) + " pixels");
 
@@ -208,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        //IDK
         switch (requestCode){
             case REQUEST_GALLERY:
                 try {
@@ -249,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // Pose Detect
+    //I WILL  EXPLAIN THIS
     AccuratePoseDetectorOptions options =
             new AccuratePoseDetectorOptions.Builder()
                     .setDetectorMode(AccuratePoseDetectorOptions.SINGLE_IMAGE_MODE)
@@ -316,17 +319,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Calculate the user's height
             assert leftShoulder != null;
             double heightInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftShoulder.getPosition().y),2));
-            double heightInMeters = heightInPixels * pixel_to_meter_ratio;
+            double heightInMeters = heightInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's thigh length
             assert leftHip != null;
             assert leftKnee != null;
             double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
-            double thighLengthInMeters = thighLengthInPixels * pixel_to_meter_ratio;
+            double thighLengthInMeters = thighLengthInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's calf length
             double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
-            double calfLengthInMeters = calfLengthInPixels * pixel_to_meter_ratio;
+            double calfLengthInMeters = calfLengthInPixels / pixel_to_meter_ratio;
 
             String heightP_str = String.format("%.2f",heightInPixels);
             String calfP_str = String.format("%.2f",calfLengthInPixels);
@@ -334,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String height_str = String.format("%.2f",heightInMeters);
             String calf_str = String.format("%.2f",calfLengthInMeters);
             String thigh_str = String.format("%.2f",thighLengthInMeters);
-            String fov_str = String.format("%.2f",field_of_vision);
+            String fov_str = String.valueOf(field_of_vision);
             String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
             String distP_str = String.format("%.2f",distance_pixels);
             String ss_str = String.format("%.2f",sensorSizeMM);
