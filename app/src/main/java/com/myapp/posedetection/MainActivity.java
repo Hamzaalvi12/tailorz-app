@@ -3,17 +3,10 @@ package com.myapp.posedetection;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
-
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -29,7 +22,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,12 +37,8 @@ import com.wonderkiln.camerakit.CameraKitEventListener;
 import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
-
 import java.io.InputStream;
-
 import java.lang.Math;
-
-import static java.lang.Math.atan;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.tan;
 
@@ -65,15 +53,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CameraManager manager;
     String cameraId;
 
+    // declare variable for sensor size, focal length and field of vision
     SizeF sensor_size;
     private double focal_length;
     Size previewSize;
 
-    // calculate Field of vision
-
     private double sensorSizeMM;
-    private double sensorDiagonalPixels;
-    private double focalLengthPixels;
     private double field_of_vision;
 
 
@@ -119,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         assert characteristics != null;
 
         // get the sensor size and focal length
-        //WHY FOCEL LENGATH 0
+        //WHY FOCAL LENGTH 0
         sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);;
         focal_length = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)[0];;
 
@@ -132,22 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("focal_length", "Focal Length: "+ String.format("%.2f",focal_length) + " mm");
 
         // calculate Field of vision
-
         sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focal_length);
-
-       /* sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
-        Log.d("sensor_size", "Sensor Size in MM: "+ String.format("%.2f",sensorSizeMM) + " mm");
-        //WHAT IS THIS
-        sensorDiagonalPixels = Math.sqrt(Math.pow(previewSize.getWidth(), 2) + Math.pow(previewSize.getHeight(), 2));
-        Log.d("sensor_size", "Sensor Diagonal Pixels: " + String.format("%.2f",sensorDiagonalPixels) + " pixels");
-        //IDK
-        focalLengthPixels = focal_length * sensorDiagonalPixels / sensorSizeMM;
-        Log.d("focal_length", "Focal Length in Pixels: "+ String.format("%.2f",focalLengthPixels) + " pixels");
-
-        //field_of_vision = (360 * Math.atan2(sensorSizeMM / 2, focalLengthPixels))/Math.PI;
-        //Calculate the Field of Vision in Radians (not degrees)
-        //field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);*/
         Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
 
 
@@ -302,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
             PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
             PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
-            PoseLandmark rightHip = pose        .getPoseLandmark(PoseLandmark.RIGHT_HIP);
+            PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
             PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
             PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
             PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
@@ -348,7 +319,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String distP_str = String.format("%.2f",distance_pixels);
             String ss_str = String.format("%.2f",sensorSizeMM);
             String fc_str = String.format("%.2f",focal_length);
-            String fc_str_p = String.format("%.2f", focalLengthPixels);
             String pv_w = String.valueOf(previewSize.getWidth());
             String pv_h = String.valueOf(previewSize.getHeight());
             String ss_w = String.valueOf(sensor_size.getWidth());
@@ -357,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             String measureText ="sensor size : "+ ss_str +" mm\n" +
                     "focal length : "+ fc_str +" mm\n" +
-                    "focal length (p): "+ fc_str_p +" pixels\n" +
                     "field of vision : "+ fov_str +" radians\n" +
                     "sensor size : "+ ss_w + "X " + ss_h + "\n"+
                     "preview Size : "+ pv_w +" X " + pv_h + "\n" +
