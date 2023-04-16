@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focal_length);
 
-        sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
+       /* sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         Log.d("sensor_size", "Sensor Size in MM: "+ String.format("%.2f",sensorSizeMM) + " mm");
         //WHAT IS THIS
         sensorDiagonalPixels = Math.sqrt(Math.pow(previewSize.getWidth(), 2) + Math.pow(previewSize.getHeight(), 2));
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //field_of_vision = (360 * Math.atan2(sensorSizeMM / 2, focalLengthPixels))/Math.PI;
         //Calculate the Field of Vision in Radians (not degrees)
-        //field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);
+        //field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);*/
         Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
 
 
@@ -315,7 +315,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             assert leftAnkle != null;
             double distance_pixels = sqrt(Math.pow((rightAnkle.getPosition().x - leftAnkle.getPosition().x),2) + Math.pow((rightAnkle.getPosition().y - leftAnkle.getPosition().y),2));
             Log.d("distP","distance_pixels: "+distance_pixels);
-            double distance_from_camera = 2.0;
+            //this is the distance between user's anckel in meters
+            double distance_from_camera = 0.5;
 
             //calculate the Pixel to Meter Ratio
             double pixel_to_meter_ratio = distance_pixels / (2 * distance_from_camera * tan(field_of_vision / 2));
