@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //field_of_vision = (360 * Math.atan2(sensorSizeMM / 2, focalLengthPixels))/Math.PI;
         //Calculate the Field of Vision in Radians (not degrees)
-        field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);
+        //field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);
         Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
 
 
