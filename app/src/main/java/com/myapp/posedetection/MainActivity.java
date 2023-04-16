@@ -312,7 +312,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             assert leftAnkle != null;
             double distance_pixels = sqrt(Math.pow((rightAnkle.getPosition().x - leftAnkle.getPosition().x),2) + Math.pow((rightAnkle.getPosition().y - leftAnkle.getPosition().y),2));
             Log.d("distP","distance_pixels: "+distance_pixels);
-            double distance_from_camera = 2.0;
+            //I'm a hero
+            double distance_from_camera = 0.5;
 
             //calculate the Pixel to Meter Ratio
             double pixel_to_meter_ratio = distance_pixels / (2 * distance_from_camera * tan(field_of_vision / 2));
