@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 }
             }
+            //IDK
             if (defaultCameraId == null && cameraIds.length > 0) {
                 defaultCameraId = cameraIds[0];
             }
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-        CameraCharacteristics characteristics = null;
+         CameraCharacteristics characteristics = null;
         try {
             characteristics = manager.getCameraCharacteristics(cameraId);
         } catch (CameraAccessException e) {
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         assert characteristics != null;
 
         // get the sensor size and focal length
+        //WHY FOCEL LENGATH 0
         sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);;
         focal_length = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)[0];;
 
@@ -134,19 +136,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focal_length);
 
-        /*sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
+       /* sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         Log.d("sensor_size", "Sensor Size in MM: "+ String.format("%.2f",sensorSizeMM) + " mm");
-
+        //WHAT IS THIS
         sensorDiagonalPixels = Math.sqrt(Math.pow(previewSize.getWidth(), 2) + Math.pow(previewSize.getHeight(), 2));
         Log.d("sensor_size", "Sensor Diagonal Pixels: " + String.format("%.2f",sensorDiagonalPixels) + " pixels");
-
+        //IDK
         focalLengthPixels = focal_length * sensorDiagonalPixels / sensorSizeMM;
         Log.d("focal_length", "Focal Length in Pixels: "+ String.format("%.2f",focalLengthPixels) + " pixels");
 
         //field_of_vision = (360 * Math.atan2(sensorSizeMM / 2, focalLengthPixels))/Math.PI;
         //Calculate the Field of Vision in Radians (not degrees)
-        field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);
-        Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));*/
+        //field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focalLengthPixels);*/
+        Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
 
 
         cameraButton = findViewById(R.id.cameraBtn);
@@ -213,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        //IDK
         switch (requestCode){
             case REQUEST_GALLERY:
                 try {
@@ -254,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // Pose Detect
+    //I WILL  EXPLAIN THIS
     AccuratePoseDetectorOptions options =
             new AccuratePoseDetectorOptions.Builder()
                     .setDetectorMode(AccuratePoseDetectorOptions.SINGLE_IMAGE_MODE)
@@ -299,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
             PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
             PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
-            PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+            PoseLandmark rightHip = pose        .getPoseLandmark(PoseLandmark.RIGHT_HIP);
             PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
             PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
             PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
@@ -312,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             assert leftAnkle != null;
             double distance_pixels = sqrt(Math.pow((rightAnkle.getPosition().x - leftAnkle.getPosition().x),2) + Math.pow((rightAnkle.getPosition().y - leftAnkle.getPosition().y),2));
             Log.d("distP","distance_pixels: "+distance_pixels);
-            //I'm a hero
+            //this is the distance between user's anckel in meters
             double distance_from_camera = 0.5;
 
             //calculate the Pixel to Meter Ratio
