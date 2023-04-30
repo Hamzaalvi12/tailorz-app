@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -60,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private double sensorSizeMM;
     private double field_of_vision;
+
+    private float height_in_pixels;
 
 
 
@@ -153,6 +158,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressBar.setVisibility(View.VISIBLE);
                 Bitmap bitmap = cameraKitImage.getBitmap();
                 bitmap = Bitmap.createScaledBitmap(bitmap, cameraViewPose.getWidth(), cameraViewPose.getHeight(), false);
+
+                //draw lines on the silhouette
+
+                Paint paint = new Paint();
+                paint.setColor(Color.GREEN);
+                float strokeWidth = 4.0f;
+                paint.setStrokeWidth(strokeWidth);
+
+                Bitmap drawBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+
+                Canvas canvas =new Canvas(drawBitmap);
+                canvas.drawBitmap(bitmap, 0f, 0f, null);
+
+                float startX = bitmap.getWidth()/2;
+                float endX = bitmap.getWidth()/2;
+                float startY = 0.1f * bitmap.getHeight();
+                float endY = 0.9f * bitmap.getHeight();
+
+                height_in_pixels = 0.8f * bitmap.getHeight();
+
+                canvas.drawLine(startX, startY, endX, endY, paint);
+
                 cameraViewPose.stop();
                 runPose(bitmap);
             }
@@ -323,10 +350,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String pv_h = String.valueOf(previewSize.getHeight());
             String ss_w = String.valueOf(sensor_size.getWidth());
             String ss_h = String.valueOf(sensor_size.getHeight());
+            String lh_str = String.format("%.2f", height_in_pixels);
 
 
             String measureText ="sensor size : "+ ss_str +" mm\n" +
                     "focal length : "+ fc_str +" mm\n" +
+                    "Line height in pixels : "+ lh_str +" pixels\n" +
                     "field of vision : "+ fov_str +" radians\n" +
                     "sensor size : "+ ss_w + "X " + ss_h + "\n"+
                     "preview Size : "+ pv_w +" X " + pv_h + "\n" +
@@ -338,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     "Height: "+ height_str +" metres\n" +
                     "Calf Length: "+ calf_str +" metres\n" +
                     "Thigh Length: "+ thigh_str +" metres\n";
+
+            //Initialise the Intent and Start the activity
 
             Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             intent.putExtra("Text", measureText);
