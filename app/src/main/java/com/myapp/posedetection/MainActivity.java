@@ -166,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 float strokeWidth = 4.0f;
                 paint.setStrokeWidth(strokeWidth);
 
-                Bitmap drawBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+                //Bitmap drawBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
 
-                Canvas canvas =new Canvas(drawBitmap);
+                Canvas canvas =new Canvas(bitmap);
                 canvas.drawBitmap(bitmap, 0f, 0f, null);
 
                 float startX = bitmap.getWidth()/2;
@@ -295,18 +295,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
             PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
-            PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
-            PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
+            //PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
+            //PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
             PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
             PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
             PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
             PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
             PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
-            PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
+            //PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
             PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
             PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
             Log.d("PROCESS POSE", "PROCESS POSE FUNCTION IS RUNNING");
-            Log.d("right ankle:","right ankle: "+ rightAnkle);
+            //Log.d("right ankle:","right ankle: "+ rightAnkle);
 
             //Calculate the distance between the user's Ankles in pixels
             assert rightAnkle != null;
@@ -320,53 +320,103 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double pixel_to_meter_ratio = distance_pixels / (2 * distance_from_camera * tan(field_of_vision / 2));
             Log.d("ptm","pixel to meters: "+pixel_to_meter_ratio);
 
-            // Calculate the user's height
+            // Calculate the user's height for kameez
             assert leftShoulder != null;
-            double heightInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftShoulder.getPosition().y),2));
+            double heightInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftShoulder.getPosition().y),2));
             double heightInMeters = heightInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's thigh length
             assert leftHip != null;
             assert leftKnee != null;
-            double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
-            double thighLengthInMeters = thighLengthInPixels / pixel_to_meter_ratio;
+            //double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
+            //double thighLengthInMeters = thighLengthInPixels / pixel_to_meter_ratio;
 
             // Calculate the user's calf length
-            double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
-            double calfLengthInMeters = calfLengthInPixels / pixel_to_meter_ratio;
+            //double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
+            //double calfLengthInMeters = calfLengthInPixels / pixel_to_meter_ratio;
 
+
+            // Calculate the users chest length
+            double chestInPixels = sqrt(Math.pow((leftShoulder.getPosition().x - rightShoulder.getPosition().x),2) + Math.pow((leftShoulder.getPosition().y - rightShoulder.getPosition().y),2));;
+            double chestInMeters = chestInPixels / pixel_to_meter_ratio;
+
+            // Calculate the users left arm length
+            double armleftInPixels = sqrt(Math.pow((leftWrist.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftWrist.getPosition().y - leftShoulder.getPosition().y),2));;
+            double armleftInMeters = armleftInPixels / pixel_to_meter_ratio;
+
+            // Calculate the users right arm length
+            double armrightInPixels = sqrt(Math.pow((rightWrist.getPosition().x - rightShoulder.getPosition().x),2) + Math.pow((rightWrist.getPosition().y - rightShoulder.getPosition().y),2));;
+            double armrightInMeters = armrightInPixels / pixel_to_meter_ratio;
+
+            // Calculate the users leg length
+            double legleftInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftHip.getPosition().y),2));;;
+            double legleftInMeters = legleftInPixels / pixel_to_meter_ratio;
+
+            // Calculate the users leg length
+            double legrightInPixels = sqrt(Math.pow((rightAnkle.getPosition().x - rightHip.getPosition().x),2) + Math.pow((rightAnkle.getPosition().y - rightHip.getPosition().y),2));;;
+            double legrightInMeters = legrightInPixels / pixel_to_meter_ratio;
+
+            // Calculate the users hip length
+            double hipInPixels = sqrt(Math.pow((leftHip.getPosition().x - rightHip.getPosition().x),2) + Math.pow((leftHip.getPosition().y - rightHip.getPosition().y),2));;;;
+            double hipInMeters = hipInPixels / pixel_to_meter_ratio;
+
+            String chestP_str = String.format("%.2f",chestInPixels);
+            String chest_str = String.format("%.2f",chestInMeters);
+            String armleftP_str = String.format("%.2f",armleftInPixels);
+            String armleft_str = String.format("%.2f",armleftInMeters);
+            String armrightP_str = String.format("%.2f",armrightInPixels);
+            String armright_str = String.format("%.2f",armrightInMeters);
+            String legleftP_str = String.format("%.2f",legleftInPixels);
+            String legleft_str = String.format("%.2f",legleftInMeters);
+            String legrightP_str = String.format("%.2f",legrightInPixels);
+            String legright_str = String.format("%.2f",legrightInMeters);
+            String hipP_str = String.format("%.2f",hipInPixels);
+            String hip_str = String.format("%.2f",hipInMeters);
             String heightP_str = String.format("%.2f",heightInPixels);
-            String calfP_str = String.format("%.2f",calfLengthInPixels);
-            String thighP_str = String.format("%.2f",thighLengthInPixels);
+          //  String calfP_str = String.format("%.2f",calfLengthInPixels);
+            //String thighP_str = String.format("%.2f",thighLengthInPixels);
             String height_str = String.format("%.2f",heightInMeters);
-            String calf_str = String.format("%.2f",calfLengthInMeters);
-            String thigh_str = String.format("%.2f",thighLengthInMeters);
-            String fov_str = String.valueOf(field_of_vision);
-            String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
-            String distP_str = String.format("%.2f",distance_pixels);
-            String ss_str = String.format("%.2f",sensorSizeMM);
-            String fc_str = String.format("%.2f",focal_length);
-            String pv_w = String.valueOf(previewSize.getWidth());
-            String pv_h = String.valueOf(previewSize.getHeight());
-            String ss_w = String.valueOf(sensor_size.getWidth());
-            String ss_h = String.valueOf(sensor_size.getHeight());
-            String lh_str = String.format("%.2f", height_in_pixels);
+            //String calf_str = String.format("%.2f",calfLengthInMeters);
+           // String thigh_str = String.format("%.2f",thighLengthInMeters);
+            //String fov_str = String.valueOf(field_of_vision);
+           // String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
+           // String distP_str = String.format("%.2f",distance_pixels);
+           // String ss_str = String.format("%.2f",sensorSizeMM);
+            //String fc_str = String.format("%.2f",focal_length);
+            //String pv_w = String.valueOf(previewSize.getWidth());
+           // String pv_h = String.valueOf(previewSize.getHeight());
+            //String ss_w = String.valueOf(sensor_size.getWidth());
+            //String ss_h = String.valueOf(sensor_size.getHeight());
+           // String lh_str = String.format("%.2f", height_in_pixels);
 
 
-            String measureText ="sensor size : "+ ss_str +" mm\n" +
-                    "focal length : "+ fc_str +" mm\n" +
-                    "Line height in pixels : "+ lh_str +" pixels\n" +
-                    "field of vision : "+ fov_str +" radians\n" +
-                    "sensor size : "+ ss_w + "X " + ss_h + "\n"+
-                    "preview Size : "+ pv_w +" X " + pv_h + "\n" +
-                    "pixel to meters ratio : "+ ptm_str +"\n" +
-                    "feet distance : "+ distP_str +" pixels\n" +
+            String measureText =
+                    //"sensor size : "+ ss_str +" mm\n" +
+                    //"focal length : "+ fc_str +" mm\n" +
+                    //"Line height in pixels : "+ lh_str +" pixels\n" +
+                   // "field of vision : "+ fov_str +" radians\n" +
+                   // "sensor size : "+ ss_w + "X " + ss_h + "\n"+
+                   // "preview Size : "+ pv_w +" X " + pv_h + "\n" +
+                   // "pixel to meters ratio : "+ ptm_str +"\n" +
+                   // "feet distance : "+ distP_str +" pixels\n" +
+                    "chest in pixels: "+ chestP_str +" pixels\n" +
+                            "chest in meters: "+ chest_str +" meters\n" +
+                            "arm left in pixels: "+ armleftP_str +" pixels\n" +
+                            "arm left in meters: "+ armleft_str +" meters\n" +
+                            "arm right in pixels: "+ armrightP_str +" pixels\n" +
+                            "arm right in meters: "+ armright_str +" meters\n" +
+                            "leg left in pixels: "+ legrightP_str +" pixels\n" +
+                            "leg left in meters: "+ legleft_str +" meters\n" +
+                            "leg right in pixels: "+ legleftP_str +" pixels\n" +
+                            "leg right in meters: "+ legright_str +" meters\n" +
+                            "hip in pixels: "+ hipP_str +" pixels\n" +
+                            "hip in meters: "+ hip_str +" meters\n" +
                     "Height in pixels: "+ heightP_str +" pixels\n" +
-                    "Calf Length in pixels: "+ calfP_str +" pixels\n" +
-                    "Thigh Length in pixels: "+ thighP_str +" pixels\n"+
-                    "Height: "+ height_str +" metres\n" +
-                    "Calf Length: "+ calf_str +" metres\n" +
-                    "Thigh Length: "+ thigh_str +" metres\n";
+                    //"Calf Length in pixels: "+ calfP_str +" pixels\n" +
+                    //"Thigh Length in pixels: "+ thighP_str +" pixels\n"+
+                    "Height: "+ height_str +" metres\n" ;
+                   // "Calf Length: "+ calf_str +" metres\n" +
+                    //"Thigh Length: "+ thigh_str +" metres\n";
 
             //Initialise the Intent and Start the activity
 
