@@ -7,19 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Size;
 import android.util.SizeF;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -59,13 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // declare variable for sensor size, focal length and field of vision
     SizeF sensor_size;
     private double focal_length;
-    Size previewSize;
 
     private double sensorSizeMM;
     private double field_of_vision;
-
-    private float height_in_pixels;
-
 
 
     @Override
@@ -113,19 +103,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sensor_size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);;
         focal_length = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)[0];;
 
-        StreamConfigurationMap streamMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        Size[] previewSizes = streamMap.getOutputSizes(SurfaceTexture.class);
-        previewSize = previewSizes[0];
-
-        Log.d("sensor_size", "Sensor Size Height: " + String.format("%.2f",sensor_size.getHeight()) + " mm");
-        Log.d("sensor_size", "Sensor Size Width: " + String.format("%.2f",sensor_size.getWidth()) + " mm");
-        Log.d("focal_length", "Focal Length: "+ String.format("%.2f",focal_length) + " mm");
-
         // calculate Field of vision
         sensorSizeMM = Math.sqrt(Math.pow(sensor_size.getWidth(), 2) + Math.pow(sensor_size.getHeight(), 2));
         field_of_vision = 2 * Math.atan2(sensorSizeMM / 2, focal_length);
-        Log.d("fov","Field of Vision: " + String.format("%.2f",field_of_vision));
-
 
         cameraButton = findViewById(R.id.cameraBtn);
         galleryButton = findViewById(R.id.galleryBtn);
@@ -158,28 +138,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressBar.setVisibility(View.VISIBLE);
                 Bitmap bitmap = cameraKitImage.getBitmap();
                 bitmap = Bitmap.createScaledBitmap(bitmap, cameraViewPose.getWidth(), cameraViewPose.getHeight(), false);
-
-                //draw lines on the silhouette
-
-                Paint paint = new Paint();
-                paint.setColor(Color.GREEN);
-                float strokeWidth = 4.0f;
-                paint.setStrokeWidth(strokeWidth);
-
-                //Bitmap drawBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
-
-                Canvas canvas =new Canvas(bitmap);
-                canvas.drawBitmap(bitmap, 0f, 0f, null);
-
-                float startX = bitmap.getWidth()/2;
-                float endX = bitmap.getWidth()/2;
-                float startY = 0.1f * bitmap.getHeight();
-                float endY = 0.9f * bitmap.getHeight();
-
-                height_in_pixels = 0.8f * bitmap.getHeight();
-
-                canvas.drawLine(startX, startY, endX, endY, paint);
-
                 cameraViewPose.stop();
                 runPose(bitmap);
             }
@@ -325,16 +283,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double heightInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftShoulder.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftShoulder.getPosition().y),2));
             double heightInMeters = heightInPixels / pixel_to_meter_ratio;
 
-            // Calculate the user's thigh length
-            assert leftHip != null;
-            assert leftKnee != null;
-            //double thighLengthInPixels = sqrt(Math.pow((leftKnee.getPosition().x - leftHip.getPosition().x),2) + Math.pow((leftKnee.getPosition().y - leftHip.getPosition().y),2));
-            //double thighLengthInMeters = thighLengthInPixels / pixel_to_meter_ratio;
-
-            // Calculate the user's calf length
-            //double calfLengthInPixels = sqrt(Math.pow((leftAnkle.getPosition().x - leftKnee.getPosition().x),2) + Math.pow((leftAnkle.getPosition().y - leftKnee.getPosition().y),2));
-            //double calfLengthInMeters = calfLengthInPixels / pixel_to_meter_ratio;
-
 
             // Calculate the users chest length
             double chestInPixels = sqrt(Math.pow((leftShoulder.getPosition().x - rightShoulder.getPosition().x),2) + Math.pow((leftShoulder.getPosition().y - rightShoulder.getPosition().y),2));;
@@ -373,33 +321,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String hipP_str = String.format("%.2f",hipInPixels);
             String hip_str = String.format("%.2f",hipInMeters);
             String heightP_str = String.format("%.2f",heightInPixels);
-          //  String calfP_str = String.format("%.2f",calfLengthInPixels);
-            //String thighP_str = String.format("%.2f",thighLengthInPixels);
             String height_str = String.format("%.2f",heightInMeters);
-            //String calf_str = String.format("%.2f",calfLengthInMeters);
-           // String thigh_str = String.format("%.2f",thighLengthInMeters);
-            //String fov_str = String.valueOf(field_of_vision);
-           // String ptm_str = String.format("%.2f",pixel_to_meter_ratio);
-           // String distP_str = String.format("%.2f",distance_pixels);
-           // String ss_str = String.format("%.2f",sensorSizeMM);
-            //String fc_str = String.format("%.2f",focal_length);
-            //String pv_w = String.valueOf(previewSize.getWidth());
-           // String pv_h = String.valueOf(previewSize.getHeight());
-            //String ss_w = String.valueOf(sensor_size.getWidth());
-            //String ss_h = String.valueOf(sensor_size.getHeight());
-           // String lh_str = String.format("%.2f", height_in_pixels);
 
 
             String measureText =
-                    //"sensor size : "+ ss_str +" mm\n" +
-                    //"focal length : "+ fc_str +" mm\n" +
-                    //"Line height in pixels : "+ lh_str +" pixels\n" +
-                   // "field of vision : "+ fov_str +" radians\n" +
-                   // "sensor size : "+ ss_w + "X " + ss_h + "\n"+
-                   // "preview Size : "+ pv_w +" X " + pv_h + "\n" +
-                   // "pixel to meters ratio : "+ ptm_str +"\n" +
-                   // "feet distance : "+ distP_str +" pixels\n" +
-                    "chest in pixels: "+ chestP_str +" pixels\n" +
+
+                            "chest in pixels: "+ chestP_str +" pixels\n" +
                             "chest in meters: "+ chest_str +" meters\n" +
                             "arm left in pixels: "+ armleftP_str +" pixels\n" +
                             "arm left in meters: "+ armleft_str +" meters\n" +
@@ -411,12 +338,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             "leg right in meters: "+ legright_str +" meters\n" +
                             "hip in pixels: "+ hipP_str +" pixels\n" +
                             "hip in meters: "+ hip_str +" meters\n" +
-                    "Height in pixels: "+ heightP_str +" pixels\n" +
-                    //"Calf Length in pixels: "+ calfP_str +" pixels\n" +
-                    //"Thigh Length in pixels: "+ thighP_str +" pixels\n"+
-                    "Height: "+ height_str +" metres\n" ;
-                   // "Calf Length: "+ calf_str +" metres\n" +
-                    //"Thigh Length: "+ thigh_str +" metres\n";
+                             "Height in pixels: "+ heightP_str +" pixels\n" +
+                             "Height: "+ height_str +" metres\n" ;
 
             //Initialise the Intent and Start the activity
 
